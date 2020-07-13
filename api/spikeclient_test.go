@@ -7,12 +7,14 @@ import (
 	"net/http"
 	"reflect"
 	"testing"
+
+	"github.com/CArnoud/go-rebbl-elo/config"
 )
 
 type MockGetter struct{}
 
 func (g *MockGetter) Get(url string) (*http.Response, error) {
-	if url == "666" {
+	if url == "?league_id=666" {
 		return nil, errors.New("mockerror")
 	}
 
@@ -24,6 +26,8 @@ func TestSpikeClient_GetCompetitions(t *testing.T) {
 	mockLeagueID := uint(124)
 	errorLeagueID := uint(666)
 
+	mockConfig := config.Config{}
+
 	type args struct {
 		leagueID uint
 	}
@@ -34,8 +38,8 @@ func TestSpikeClient_GetCompetitions(t *testing.T) {
 		want    []byte
 		wantErr bool
 	}{
-		{"Success", NewSpikeClient(&MockGetter{}), args{mockLeagueID}, []byte{49, 50, 52}, false},
-		{"Failure", NewSpikeClient(&MockGetter{}), args{errorLeagueID}, nil, true},
+		{"Success", NewSpikeClient(&mockConfig, &MockGetter{}), args{mockLeagueID}, []byte("?league_id=124"), false},
+		{"Failure", NewSpikeClient(&mockConfig, &MockGetter{}), args{errorLeagueID}, nil, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

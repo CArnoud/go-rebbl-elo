@@ -1,0 +1,4 @@
+SPIKE_API_KEY: <secret>
+SPIKE_HOST: https://api.spike.ovh/
+SPIKE_COMPETITIONS_PATH: /leagues/competitions
+SPIKE_MATCHES_PATH: /competitions/get_contests

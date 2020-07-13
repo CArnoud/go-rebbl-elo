@@ -4,6 +4,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+
+	"github.com/CArnoud/go-rebbl-elo/config"
 )
 
 // Getter interface to make HTTP GET requests.
@@ -13,12 +15,19 @@ type Getter interface {
 
 // SpikeClient client to access Spike endpoints
 type SpikeClient struct {
+	config *config.Config
 	getter Getter
+}
+
+func (c *SpikeClient) makeCompetitionsURL(leagueID uint) string {
+	url := c.config.SpikeAPIHost + c.config.SpikeCompetitionsPath
+	url = url + "?league_id=" + strconv.FormatUint(uint64(leagueID), 10)
+	return url
 }
 
 // GetCompetitions returns a list of competition IDs for a league.
 func (c *SpikeClient) GetCompetitions(leagueID uint) ([]byte, error) {
-	resp, err := c.getter.Get("" + strconv.FormatUint(uint64(leagueID), 10))
+	resp, err := c.getter.Get(c.makeCompetitionsURL(leagueID))
 	if err != nil {
 		return nil, err
 	}
@@ -33,6 +42,6 @@ func (c *SpikeClient) GetCompetitions(leagueID uint) ([]byte, error) {
 }
 
 // NewSpikeClient creates an instance of SpikeClient.
-func NewSpikeClient(getter Getter) *SpikeClient {
-	return &SpikeClient{getter}
+func NewSpikeClient(config *config.Config, getter Getter) *SpikeClient {
+	return &SpikeClient{config, getter}
 }
