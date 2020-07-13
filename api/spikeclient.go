@@ -1,35 +1,42 @@
 package api
 
 import (
+	"errors"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/CArnoud/go-rebbl-elo/config"
 )
 
-// Getter interface to make HTTP GET requests.
-type Getter interface {
-	Get(string) (*http.Response, error)
+// Doer interface to make HTTP GET requests.
+type Doer interface {
+	Do(*http.Request) (*http.Response, error)
 }
 
 // SpikeClient client to access Spike endpoints
 type SpikeClient struct {
 	config *config.Config
-	getter Getter
+	doer   Doer
 }
 
-func (c *SpikeClient) makeCompetitionsURL(leagueID uint) string {
-	url := c.config.SpikeAPIHost + c.config.SpikeCompetitionsPath
-	url = url + "?league_id=" + strconv.FormatUint(uint64(leagueID), 10)
-	return url
-}
+func (c *SpikeClient) makeGetRequest(url string) ([]byte, error) {
+	log.Println("Making HTTP request to " + url)
 
-// GetCompetitions returns a list of competition IDs for a league.
-func (c *SpikeClient) GetCompetitions(leagueID uint) ([]byte, error) {
-	resp, err := c.getter.Get(c.makeCompetitionsURL(leagueID))
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
+	}
+
+	req.Header.Add("API_KEY", c.config.SpikeAPIKey)
+	resp, err := c.doer.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, errors.New("HTTP error: " + resp.Status)
 	}
 
 	defer resp.Body.Close()
@@ -41,7 +48,31 @@ func (c *SpikeClient) GetCompetitions(leagueID uint) ([]byte, error) {
 	return body, nil
 }
 
+// GetCompetitions returns a list of competition IDs for a league.
+func (c *SpikeClient) GetCompetitions(leagueID uint) ([]byte, error) {
+	url := c.config.SpikeAPIHost + c.config.SpikeCompetitionsPath
+	url = url + "?league_id=" + strconv.FormatUint(uint64(leagueID), 10)
+	body, err := c.makeGetRequest(url)
+	if err != nil {
+		return nil, err
+	}
+
+	return body, nil
+}
+
+// GetContests returns a list of matches in a specific competition.
+func (c *SpikeClient) GetContests(competitionID uint, status uint) ([]byte, error) {
+	url := c.config.SpikeAPIHost + c.config.SpikeContestsPath
+	url = url + "?competition_id=" + strconv.FormatUint(uint64(competitionID), 10) + ";status=" + strconv.FormatUint(uint64(status), 10)
+	body, err := c.makeGetRequest(url)
+	if err != nil {
+		return nil, err
+	}
+
+	return body, err
+}
+
 // NewSpikeClient creates an instance of SpikeClient.
-func NewSpikeClient(config *config.Config, getter Getter) *SpikeClient {
-	return &SpikeClient{config, getter}
+func NewSpikeClient(config *config.Config, doer Doer) *SpikeClient {
+	return &SpikeClient{config, doer}
 }

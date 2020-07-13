@@ -1,0 +1,32 @@
+{
+    "competitions": [
+        {
+            "id": 191991,
+            "platform_id": 1,
+            "date_created": "2020-05-17 14:36:49",
+            "format": "round_robin",
+            "league_id": 42291,
+            "name": "Season 14 - Division 4A",
+            "round": 8,
+            "rounds_count": 13,
+            "status": 1,
+            "teams_count": 14,
+            "teams_max": 14,
+            "turn_duration": 3
+        },
+        {
+            "id": 191988,
+            "platform_id": 1,
+            "date_created": "2020-05-17 14:36:49",
+            "format": "round_robin",
+            "league_id": 42291,
+            "name": "Season 14 - Division 3A",
+            "round": 8,
+            "rounds_count": 13,
+            "status": 1,
+            "teams_count": 14,
+            "teams_max": 14,
+            "turn_duration": 3
+        }
+    ]
+}

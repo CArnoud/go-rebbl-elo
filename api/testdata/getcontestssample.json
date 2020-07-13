@@ -1,0 +1,74 @@
+{
+    "contests": [
+        {
+            "contest_id": 1071358,
+            "platform_id": 1,
+            "competition_id": 191991,
+            "competition_name": "Season 14 - Division 4A",
+            "current_round": 8,
+            "format": "round_robin",
+            "league_id": 42291,
+            "league_name": "REBBL - GMan",
+            "max_round": 13,
+            "status": 2,
+            "team_away": {
+                "team_name": "Rex Lupus",
+                "team_id": 3213705,
+                "team_logo": "Necromantic_10",
+                "team_value": 1560,
+                "race": "Necromantic",
+                "coach_name": "Jojishi",
+                "coach_id": 93409,
+                "score": 1
+            },
+            "team_home": {
+                "team_name": "Face Planters",
+                "team_id": 2988690,
+                "team_logo": "HighElf_07",
+                "team_value": 1460,
+                "race": "HighElf",
+                "coach_name": "Spoon777",
+                "coach_id": 268730,
+                "score": 2
+            },
+            "match_uuid": [
+                "10007e446c"
+            ]
+        },
+        {
+            "contest_id": 1071360,
+            "platform_id": 1,
+            "competition_id": 191991,
+            "competition_name": "Season 14 - Division 4A",
+            "current_round": 8,
+            "format": "round_robin",
+            "league_id": 42291,
+            "league_name": "REBBL - GMan",
+            "max_round": 13,
+            "status": 2,
+            "team_away": {
+                "team_name": "Jellybean Jumparounds",
+                "team_id": 3205862,
+                "team_logo": "Elf_05",
+                "team_value": 1450,
+                "race": "ProElf",
+                "coach_name": "MumboJambo",
+                "coach_id": 163862,
+                "score": 2
+            },
+            "team_home": {
+                "team_name": "Cursed Cowboy's",
+                "team_id": 3031844,
+                "team_logo": "Chaos_18",
+                "team_value": 1750,
+                "race": "Chaos",
+                "coach_name": "Dimmy Gee",
+                "coach_id": 305808,
+                "score": 2
+            },
+            "match_uuid": [
+                "10007e4898"
+            ]
+        }
+    ]
+}

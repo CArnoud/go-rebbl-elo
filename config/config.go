@@ -9,7 +9,7 @@ type Config struct {
 	SpikeAPIKey           string
 	SpikeAPIHost          string
 	SpikeCompetitionsPath string
-	SpikeMatchesPath      string
+	SpikeContestsPath     string
 }
 
 // NewConfig returns an initialized Config instance.
@@ -18,6 +18,7 @@ func NewConfig() (*Config, error) {
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("./config/")
 	viper.AddConfigPath("./")
+	viper.AutomaticEnv()
 
 	err := viper.ReadInConfig()
 	if err != nil {
@@ -28,6 +29,6 @@ func NewConfig() (*Config, error) {
 		SpikeAPIKey:           viper.GetString("SPIKE_API_KEY"),
 		SpikeAPIHost:          viper.GetString("SPIKE_HOST"),
 		SpikeCompetitionsPath: viper.GetString("SPIKE_COMPETITIONS_PATH"),
-		SpikeMatchesPath:      viper.GetString("SPIKE_MATCHES_PATH"),
+		SpikeContestsPath:     viper.GetString("SPIKE_CONTESTS_PATH"),
 	}, nil
 }

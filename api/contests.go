@@ -4,21 +4,25 @@ import (
 	"encoding/json"
 )
 
-// ParseMatch .
-func ParseMatch(payload []byte) (*Match, error) {
-	var match Match
+// ParseContests .
+func ParseContests(payload []byte) ([]*Contest, error) {
+	var result ContestsPayload
 
-	err := json.Unmarshal(payload, &match)
+	err := json.Unmarshal(payload, &result)
 	if err != nil {
 		return nil, err
 	}
 
-	return &match, nil
+	return result.Contests, nil
 }
 
-// Match - JSON representing a match from Spike
-type Match struct {
-	ID              string   `json:"_id"`
+// ContestsPayload - complete payload from the contests API request.
+type ContestsPayload struct {
+	Contests []*Contest `json:"contests"`
+}
+
+// Contest - JSON representing a match from Spike.
+type Contest struct {
 	ContestID       int      `json:"contest_id"`
 	PlatformID      int      `json:"platform_id"`
 	CompetitionID   int      `json:"competition_id"`
@@ -34,10 +38,9 @@ type Match struct {
 	TeamAway        Team     `json:"team_away"`
 	TeamHome        Team     `json:"team_home"`
 	MatchUUID       []string `json:"match_uuid"`
-	Winner          Winner   `json:"winner"`
 }
 
-// Team JSON representation of a Team inside a Match
+// Team - JSON representation of a Team inside a Contest.
 type Team struct {
 	TeamName  string `json:"team_name"`
 	TeamID    int    `json:"team_id"`
@@ -47,10 +50,4 @@ type Team struct {
 	CoachName string `json:"coach_name"`
 	CoachID   int    `json:"coach_id"`
 	Score     int    `json:"score"`
-}
-
-// Winner JSON indicating who won a match
-type Winner struct {
-	CoachID int `json:"coach_id"`
-	TeamID  int `json:"team_id"`
 }
