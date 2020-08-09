@@ -18,6 +18,7 @@ type SQLClient interface {
 	Create(value interface{}) *gorm.DB
 	FirstOrCreate(out interface{}, where ...interface{}) *gorm.DB
 	Raw(table string, args ...interface{}) *gorm.DB
+	Delete(value interface{}, where ...interface{}) *gorm.DB
 }
 
 // Database .
@@ -74,6 +75,11 @@ func (d *Database) FirstOrCreate(out interface{}, where ...interface{}) error {
 func (d *Database) RawFind(table string, columns string) (*sql.Rows, error) {
 	queryString := fmt.Sprintf("SELECT %s FROM public.%s;", columns, table)
 	return d.client.Raw(queryString).Rows()
+}
+
+// Delete .
+func (d *Database) Delete(value interface{}) error {
+	return d.client.Delete(value).Error
 }
 
 // NewDatabase instantiates a database client.

@@ -4,7 +4,6 @@ import (
 	"github.com/CArnoud/go-rebbl-elo/api"
 	"github.com/CArnoud/go-rebbl-elo/config"
 	"github.com/CArnoud/go-rebbl-elo/database"
-
 	"github.com/CArnoud/go-rebbl-elo/download"
 
 	"log"
@@ -16,38 +15,34 @@ func init() {
 }
 
 func main() {
+	leagueList := []uint{
+		42290, // REL
+		42291, // GMAN
+		42292, // BIGO
+		75681, // REL2
+		75684, // GMAN2
+		34500, // Playoffs
+	}
+
 	cfg, err := config.NewConfig()
 	if err != nil {
 		log.Fatal("Unable to read config file")
 	}
-
-	spikeClient := api.NewSpikeClient(cfg, http.DefaultClient)
 
 	db, err := database.NewDatabase(cfg)
 	if err != nil {
 		log.Fatal("Unable to open database connection: " + err.Error())
 	}
 
+	spikeClient := api.NewSpikeClient(cfg, http.DefaultClient)
 	downloader := download.NewDownloader(spikeClient, db)
 
-	competitionRows, err := db.RawFind("competitions", "id, name, league_id")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer competitionRows.Close()
-
-	for competitionRows.Next() {
-		// TODO goroutine?
-		var id uint
-		var name string
-		var leagueID uint
-		competitionRows.Scan(&id, &name, &leagueID)
-
-		err := downloader.DownloadContests(id)
+	for _, leagueID := range leagueList {
+		err := downloader.DownloadCompetitions(leagueID)
 		if err != nil {
-			log.Printf("%s (%d) Error: %s", name, id, err)
+			log.Printf("League %d download error: %s", leagueID, err.Error())
+		} else {
+			log.Printf("League %d download success.", leagueID)
 		}
-
-		log.Printf("%s (%d) success.", name, id)
 	}
 }

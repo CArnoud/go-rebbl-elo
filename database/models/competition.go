@@ -37,13 +37,14 @@ func NewCompetition(c *api.Competition) *Competition {
 	}
 }
 
-// IsCompetitive evaluates the name of a competition to determined if it should be ignored.
-func IsCompetitive(name string) bool {
-	return (strings.Contains(name, " Division") ||
-		strings.Contains(name, " Swiss") ||
-		strings.Contains(name, "Season12 - Div 3") ||
-		strings.Contains(name, " Play-Ins") ||
-		strings.Contains(name, " Challenger's Cup") ||
-		strings.Contains(name, " Playoffs")) &&
-		!strings.Contains(strings.ToLower(name), " mng")
+// IsCompetitionValid evaluates the name of a competition to determine whether it should be ignored.
+func IsCompetitionValid(c *Competition) bool {
+	return strings.Contains(c.Name, " Division") ||
+		strings.Contains(c.Name, " Swiss") ||
+		strings.Contains(c.Name, "Season12 - Div 3") ||
+		strings.Contains(c.Name, " Play-Ins") ||
+		strings.Contains(c.Name, " Challenger's Cup") ||
+		strings.Contains(c.Name, " Playoffs") ||
+		(c.LeagueID == 34500 &&
+			!strings.Contains(strings.ToLower(c.Name), "mng"))
 }
