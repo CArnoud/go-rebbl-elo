@@ -10,6 +10,11 @@ type Config struct {
 	SpikeAPIHost          string
 	SpikeCompetitionsPath string
 	SpikeContestsPath     string
+	DatabaseHost          string
+	DatabasePort          string
+	DatabaseUser          string
+	DatabasePassword      string
+	DatabaseName          string
 }
 
 // NewConfig returns an initialized Config instance.
@@ -30,5 +35,10 @@ func NewConfig() (*Config, error) {
 		SpikeAPIHost:          viper.GetString("SPIKE_HOST"),
 		SpikeCompetitionsPath: viper.GetString("SPIKE_COMPETITIONS_PATH"),
 		SpikeContestsPath:     viper.GetString("SPIKE_CONTESTS_PATH"),
+		DatabaseHost:          viper.GetString("DATABASE_HOST"),
+		DatabasePort:          viper.GetString("DATABASE_PORT"),
+		DatabaseUser:          viper.GetString("DATABASE_USER"),
+		DatabasePassword:      viper.GetString("DATABASE_PASSWORD"),
+		DatabaseName:          viper.GetString("DATABASE_NAME"),
 	}, nil
 }

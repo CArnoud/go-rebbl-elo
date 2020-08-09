@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/CArnoud/go-rebbl-elo/config"
 )
@@ -49,9 +50,10 @@ func (c *SpikeClient) makeGetRequest(url string) ([]byte, error) {
 }
 
 // GetCompetitions returns a list of competition IDs for a league.
-func (c *SpikeClient) GetCompetitions(leagueID uint) ([]byte, error) {
+func (c *SpikeClient) GetCompetitions(leagueID uint, status string) ([]byte, error) {
 	url := c.config.SpikeAPIHost + c.config.SpikeCompetitionsPath
-	url = url + "?league_id=" + strconv.FormatUint(uint64(leagueID), 10)
+	url = strings.Replace(url, "<id>", strconv.FormatUint(uint64(leagueID), 10), 1)
+	url = url + "?status=" + status
 	body, err := c.makeGetRequest(url)
 	if err != nil {
 		return nil, err
@@ -63,7 +65,9 @@ func (c *SpikeClient) GetCompetitions(leagueID uint) ([]byte, error) {
 // GetContests returns a list of matches in a specific competition.
 func (c *SpikeClient) GetContests(competitionID uint, status uint) ([]byte, error) {
 	url := c.config.SpikeAPIHost + c.config.SpikeContestsPath
-	url = url + "?competition_id=" + strconv.FormatUint(uint64(competitionID), 10) + ";status=" + strconv.FormatUint(uint64(status), 10)
+	url = strings.Replace(url, "<id>", strconv.FormatUint(uint64(competitionID), 10), 1)
+	url = url + "?status=" + strconv.FormatUint(uint64(status), 10)
+	url = url + "&started=1&finished=1"
 	body, err := c.makeGetRequest(url)
 	if err != nil {
 		return nil, err

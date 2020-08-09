@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"strings"
 )
 
 // ParseContests .
@@ -38,6 +39,8 @@ type Contest struct {
 	TeamAway        Team     `json:"team_away"`
 	TeamHome        Team     `json:"team_home"`
 	MatchUUID       []string `json:"match_uuid"`
+	Started         string   `json:"started"`
+	Finished        string   `json:"finished"`
 }
 
 // Team - JSON representation of a Team inside a Contest.
@@ -50,4 +53,10 @@ type Team struct {
 	CoachName string `json:"coach_name"`
 	CoachID   int    `json:"coach_id"`
 	Score     int    `json:"score"`
+}
+
+// ContestIsCompetitive evaluate contest to check if its a competitive match.
+func ContestIsCompetitive(contest *Contest) bool {
+	return !strings.Contains(strings.ToLower(contest.TeamHome.TeamName), "admin") &&
+		!strings.Contains(strings.ToLower(contest.TeamAway.TeamName), "admin")
 }

@@ -3,11 +3,9 @@ package main
 import (
 	"github.com/CArnoud/go-rebbl-elo/api"
 	"github.com/CArnoud/go-rebbl-elo/config"
+	// "github.com/CArnoud/go-rebbl-elo/database"
 
 	"log"
-
-	// "github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"net/http"
 )
 
@@ -16,9 +14,9 @@ func init() {
 }
 
 func main() {
-	// db, err := gorm.Open("sqlite3", "test.db")
+	// db, err := gorm.Open("postgres", "host=localhost port=5432 user=postgres dbname=postgres password=password sslmode=disable")
 	// if err != nil {
-	// 	panic("failed to connect database")
+	// 	panic("failed to connect database: " + err.Error())
 	// }
 	// defer db.Close()
 
@@ -41,4 +39,11 @@ func main() {
 	}
 
 	log.Println(string(resp))
+
+	// db, err := database.NewDatabase()
+	// if err != nil {
+	// 	log.Fatal("Unable to open database connection: " + err.Error())
+	// }
+
+	// db.AutoMigrate()
 }

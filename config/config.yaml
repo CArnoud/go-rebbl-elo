@@ -1,4 +1,9 @@
+DATABASE_HOST: localhost
+DATABASE_PORT: 5432
+DATABASE_USER: postgres
+DATABASE_PASSWORD: password
+DATABASE_NAME: postgres
 SPIKE_API_KEY: <secret>
 SPIKE_HOST: https://api.spike.ovh
-SPIKE_COMPETITIONS_PATH: /leagues/get_competitions
-SPIKE_CONTESTS_PATH: /competitions/get_contests
+SPIKE_COMPETITIONS_PATH: /platforms/1/leagues/<id>/competitions
+SPIKE_CONTESTS_PATH: /platforms/1/competitions/<id>/contests

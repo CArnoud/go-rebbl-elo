@@ -7,8 +7,6 @@ import (
 // League values are REL, GMAN, BIGO
 type League struct {
 	gorm.Model
-	Name        string
-	DisplayName string
-
+	Name         string
 	Competitions []*Competition
 }

@@ -40,36 +40,35 @@ func TestParseCompetitions(t *testing.T) {
 }
 
 var wantedCompetition1 = Competition{
-	ID: 191991,
-	PlatformID: 1, 
-	DateCreated: "2020-05-17 14:36:49",
-	Format: "round_robin",
-	LeagueID: 42291,
-	Name: "Season 14 - Division 4A",    
-	Round: 8,
-	RoundsCount: 13,
-	Status: 1,
-	TeamsCount: 14,   
-	TeamsMax: 14,     
+	ID:           191991,
+	PlatformID:   1,
+	DateCreated:  "2020-05-17 14:36:49",
+	Format:       "round_robin",
+	LeagueID:     42291,
+	Name:         "Season 14 - Division 4A",
+	Round:        8,
+	RoundsCount:  13,
+	Status:       1,
+	TeamsCount:   14,
+	TeamsMax:     14,
 	TurnDuration: 3,
 }
 
 var wantedCompetition2 = Competition{
-	ID: 191988,
-	PlatformID: 1, 
-	DateCreated: "2020-05-17 14:36:49",
-	Format: "round_robin",
-	LeagueID: 42291,
-	Name: "Season 14 - Division 3A",    
-	Round: 8,
-	RoundsCount: 13,
-	Status: 1,
-	TeamsCount: 14,   
-	TeamsMax: 14,     
+	ID:           191988,
+	PlatformID:   1,
+	DateCreated:  "2020-05-17 14:36:49",
+	Format:       "round_robin",
+	LeagueID:     42291,
+	Name:         "Season 14 - Division 3A",
+	Round:        8,
+	RoundsCount:  13,
+	Status:       1,
+	TeamsCount:   14,
+	TeamsMax:     14,
 	TurnDuration: 3,
 }
 
 var wantedCompetitionsPayload CompetitionsPayload = CompetitionsPayload{
 	Competitions: []*Competition{&wantedCompetition1, &wantedCompetition2},
 }
-
