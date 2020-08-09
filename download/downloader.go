@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"sync"
 )
 
 // APIClient represents the interaction with an external API to get contests.
@@ -102,42 +103,52 @@ func (d *Downloader) DownloadContests(competitionID uint) error {
 
 	contests := append(played, scheduled...)
 
+	var wg sync.WaitGroup
 	for _, contest := range contests {
-		if api.ContestIsCompetitive(contest) {
-			errs := []error{}
-
-			homeCoach := models.NewCoach(&contest.TeamHome)
-			homeCoachIDString := fmt.Sprint(homeCoach.ID)
-			errs = append(errs, d.db.FirstOrCreate(&homeCoach, homeCoachIDString))
-
-			awayCoach := models.NewCoach(&contest.TeamAway)
-			awayCoachIDString := fmt.Sprint(awayCoach.ID)
-			errs = append(errs, d.db.FirstOrCreate(&awayCoach, awayCoachIDString))
-
-			homeTeam := models.NewTeam(&contest.TeamHome)
-			homeTeamIDString := fmt.Sprint(homeTeam.ID)
-			errs = append(errs, d.db.FirstOrCreate(&homeTeam, homeTeamIDString))
-
-			awayTeam := models.NewTeam(&contest.TeamAway)
-			awayTeamIDString := fmt.Sprint(awayTeam.ID)
-			errs = append(errs, d.db.FirstOrCreate(&awayTeam, awayTeamIDString))
-
-			if len(errs) != 0 {
-				log.Printf("Competition %d errors adding dependencies: %s", competitionID, errs)
-			}
-
-			if contest.Finished != "" {
-				err := d.db.Delete(&contest)
-				if err != nil {
-					log.Printf("*** Unable to delete contest %d: %s", contest.ContestID, err.Error())
-				}
-			}
-
-			model := models.NewMatch(contest)
-			modelIDString := fmt.Sprint(model.ID)
-			d.db.FirstOrCreate(&model, modelIDString)
-		}
+		wg.Add(1)
+		go d.insertContestWorker(contest, &wg)
 	}
 
+	wg.Wait()
+
 	return nil
+}
+
+func (d *Downloader) insertContestWorker(contest *api.Contest, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	if api.ContestIsCompetitive(contest) {
+		errs := []error{}
+
+		homeCoach := models.NewCoach(&contest.TeamHome)
+		homeCoachIDString := fmt.Sprint(homeCoach.ID)
+		errs = append(errs, d.db.FirstOrCreate(&homeCoach, homeCoachIDString))
+
+		awayCoach := models.NewCoach(&contest.TeamAway)
+		awayCoachIDString := fmt.Sprint(awayCoach.ID)
+		errs = append(errs, d.db.FirstOrCreate(&awayCoach, awayCoachIDString))
+
+		homeTeam := models.NewTeam(&contest.TeamHome)
+		homeTeamIDString := fmt.Sprint(homeTeam.ID)
+		errs = append(errs, d.db.FirstOrCreate(&homeTeam, homeTeamIDString))
+
+		awayTeam := models.NewTeam(&contest.TeamAway)
+		awayTeamIDString := fmt.Sprint(awayTeam.ID)
+		errs = append(errs, d.db.FirstOrCreate(&awayTeam, awayTeamIDString))
+
+		if errs[0] != nil || errs[1] != nil || errs[2] != nil || errs[3] != nil {
+			log.Printf("Competition %d errors adding dependencies: %s", contest.CompetitionID, errs)
+		}
+
+		model := models.NewMatch(contest)
+		if contest.Finished != "" {
+			err := d.db.Delete(&model)
+			if err != nil {
+				log.Printf("*** Unable to delete contest %d: %s", contest.ContestID, err.Error())
+			}
+		}
+
+		modelIDString := fmt.Sprint(model.ID)
+		d.db.FirstOrCreate(&model, modelIDString)
+	}
 }

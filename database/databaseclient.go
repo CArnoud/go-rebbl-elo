@@ -89,6 +89,7 @@ func NewDatabase(c *config.Config) (*Database, error) {
 	if err != nil {
 		return nil, err
 	}
+	db.LogMode(false)
 
 	return &Database{db}, nil
 }
