@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/CArnoud/go-rebbl-elo/api"
 	"github.com/CArnoud/go-rebbl-elo/config"
-	// "github.com/CArnoud/go-rebbl-elo/database"
+	"github.com/CArnoud/go-rebbl-elo/database"
+	"github.com/CArnoud/go-rebbl-elo/database/models"
+	"github.com/CArnoud/go-rebbl-elo/predictors"
+	"github.com/jinzhu/gorm"
 
 	"log"
-	"net/http"
 )
 
 func init() {
@@ -14,36 +15,53 @@ func init() {
 }
 
 func main() {
-	// db, err := gorm.Open("postgres", "host=localhost port=5432 user=postgres dbname=postgres password=password sslmode=disable")
-	// if err != nil {
-	// 	panic("failed to connect database: " + err.Error())
-	// }
-	// defer db.Close()
-
-	// log.Println("connected")
-
 	cfg, err := config.NewConfig()
 	if err != nil {
 		log.Fatal("Unable to read config file")
 	}
 
-	spikeClient := api.NewSpikeClient(cfg, http.DefaultClient)
-	// resp, err := spikeClient.GetCompetitions(42291)
-	// if err != nil {
-	// 	log.Println(err.Error())
-	// }
-
-	resp, err := spikeClient.GetContests(191991, 2)
+	db, err := database.NewDatabase(cfg)
 	if err != nil {
-		log.Println(err.Error())
+		log.Fatal("Unable to open database connection: " + err.Error())
 	}
 
-	log.Println(string(resp))
+	wantedColumns := "id, home_team_score, away_team_score, home_team_id, away_team_id, winner_id, finished"
+	matchRows, err := db.RawFind("matches", wantedColumns, "finished")
+	if err != nil {
+		log.Fatalf("Unable to select matches: %s", err.Error())
+	}
 
-	// db, err := database.NewDatabase()
-	// if err != nil {
-	// 	log.Fatal("Unable to open database connection: " + err.Error())
-	// }
+	predictor := predictors.NewTeamElo(100, 700, 1000)
+	// predictor := predictors.NewHomeTeamPicker()
 
-	// db.AutoMigrate()
+	for matchRows.Next() {
+		var id uint
+		var homeTeamScore uint
+		var awayTeamScore uint
+		var homeTeamID uint
+		var awayTeamID uint
+		var winnerID *uint
+		var finished string
+
+		err := matchRows.Scan(&id, &homeTeamScore, &awayTeamScore, &homeTeamID, &awayTeamID, &winnerID, &finished)
+		if err != nil {
+			log.Printf("Unable to scan rows: %s", err.Error())
+		} else {
+			if finished != "" {
+				match := models.Match{
+					Model: gorm.Model{ID: id},
+					HomeTeamScore: homeTeamScore,
+					AwayTeamScore: awayTeamScore,
+					HomeTeamID: homeTeamID,
+					AwayTeamID: awayTeamID,
+					WinnerID: winnerID,
+				}
+				predictor.ProcessMatch(&match)
+			} else {
+				log.Printf("Match %d unplayed", id)
+			}
+		}
+	}
+
+	log.Printf("Correct picks: %d out of %d games (%d draws)", predictor.CorrectPicks, predictor.TotalGames, predictor.Draws)
 }

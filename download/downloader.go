@@ -19,7 +19,7 @@ type APIClient interface {
 // DBClient represents the interaction with a database management system.
 type DBClient interface {
 	FirstOrCreate(interface{}, ...interface{}) error
-	RawFind(string, string) (*sql.Rows, error)
+	RawFind(string, string, string) (*sql.Rows, error)
 	Delete(interface{}) error
 }
 
@@ -100,6 +100,8 @@ func (d *Downloader) DownloadContests(competitionID uint) error {
 	} else {
 		log.Printf("Competition %d error: %s", competitionID, err.Error())
 	}
+
+	// TODO in-progress (status 1)
 
 	contests := append(played, scheduled...)
 

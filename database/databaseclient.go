@@ -33,14 +33,19 @@ func (d *Database) addforeignKeys(db *gorm.DB) {
 	db.Model(&models.Match{}).AddForeignKey("competition_id", "competitions(id)", "RESTRICT", "RESTRICT")
 	db.Model(&models.Match{}).AddForeignKey("home_team_id", "teams(id)", "RESTRICT", "RESTRICT")
 	db.Model(&models.Match{}).AddForeignKey("away_team_id", "teams(id)", "RESTRICT", "RESTRICT")
-	// db.Model(&models.Match{}).AddForeignKey("winner_id", "teams(id)", "RESTRICT", "RESTRICT")
 
 	db.Model(&models.Competition{}).AddForeignKey("league_id", "leagues(id)", "RESTRICT", "RESTRICT")
+
+	db.Model(&models.Rating{}).AddForeignKey("predictor_id", "predictors(id)", "RESTRICT", "RESTRICT")
+	db.Model(&models.Rating{}).AddForeignKey("team_id", "teams(id)", "RESTRICT", "RESTRICT")
+	db.Model(&models.Rating{}).AddForeignKey("match_id", "matches(id)", "RESTRICT", "RESTRICT")
 }
 
 // AutoMigrate .
 func (d *Database) AutoMigrate() {
 	d.client.DropTableIfExists(
+		&models.Rating{},
+		&models.Predictor{},
 		&models.Match{},
 		&models.Competition{},
 		&models.League{},
@@ -56,6 +61,8 @@ func (d *Database) AutoMigrate() {
 		&models.Match{},
 		&models.Race{},
 		&models.Team{},
+		&models.Predictor{},
+		&models.Rating{},
 	)
 
 	d.addforeignKeys(gormDB)
@@ -72,8 +79,11 @@ func (d *Database) FirstOrCreate(out interface{}, where ...interface{}) error {
 }
 
 // RawFind .
-func (d *Database) RawFind(table string, columns string) (*sql.Rows, error) {
+func (d *Database) RawFind(table string, columns string, orderBy string) (*sql.Rows, error) {
 	queryString := fmt.Sprintf("SELECT %s FROM public.%s;", columns, table)
+	if orderBy != "" {
+		queryString = fmt.Sprintf("SELECT %s FROM public.%s ORDER BY %s;", columns, table, orderBy)
+	}
 	return d.client.Raw(queryString).Rows()
 }
 

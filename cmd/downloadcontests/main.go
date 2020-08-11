@@ -31,11 +31,11 @@ func main() {
 
 	downloader := download.NewDownloader(spikeClient, db)
 
-	competitionRows, err := db.RawFind("competitions", "id, name, league_id")
+	competitionRows, err := db.RawFind("competitions", "id, name, league_id", "")
 	defer competitionRows.Close()
 	if err != nil {
 		log.Fatal(err)
-	}	
+	}
 
 	var wg sync.WaitGroup
 	for competitionRows.Next() {
